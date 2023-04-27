@@ -1,5 +1,3 @@
-import React from "react";
-
 function AddItem() {
   return (
     <div className="max-w-6xl">

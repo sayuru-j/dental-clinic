@@ -5,14 +5,14 @@ import { ArrowCircleUpIcon } from "@heroicons/react/outline";
 function Welcome() {
   const [toggle, setToggle] = useState(false);
   return (
-    <div className="max-w-6xl">
+    <div className={`max-w-6xl ${!toggle ? "" : "hidden"}`}>
       <h1
         // onClick={() => setToggle(!toggle)}
         className="font-semibold text-2xl py-4 text-accent"
       >
         Welcome!
       </h1>
-      <div className={`flex flex-col gap-4 ${!toggle ? "" : "hidden"}`}>
+      <div className="flex flex-col gap-4">
         <p>Welcome to our dental clinic's inventory page!</p>
         <p>
           Here you'll find everything you need to know about the dental products

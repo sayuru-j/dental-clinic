@@ -1,6 +1,18 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+import { ExclamationCircleIcon } from "@heroicons/react/outline";
 
 function ItemForm() {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (success) {
+      setError("");
+    }
+  }, [success]);
+
   const [state, setState] = useState({
     item_name: "",
     sku: "",
@@ -16,10 +28,46 @@ function ItemForm() {
     setState({ ...state, [item]: e.target.value });
   };
 
-  // console.log(state);
+  const {
+    item_name,
+    sku,
+    serial_number,
+    vendor_details,
+    item_location,
+    expiry_date,
+    quantity_available,
+    minimum_stock,
+  } = state;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API}/inventory/add`,
+        {
+          item_name,
+          sku,
+          serial_number,
+          vendor_details,
+          item_location,
+          expiry_date,
+          quantity_available,
+          minimum_stock,
+        }
+      );
+
+      setSuccess(response);
+    } catch (err) {
+      setError(err.response?.data?.error);
+    }
+  };
 
   return (
-    <form className="w-full lg:max-w-2xl bg-pearlWhite/30 p-5 rounded-lg">
+    <form
+      onChange={() => setSuccess("")}
+      onSubmit={handleSubmit}
+      className="w-full lg:max-w-2xl bg-pearlWhite/30 p-5 rounded-lg"
+    >
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
           <label
@@ -64,11 +112,11 @@ function ItemForm() {
             onChange={handleChange("serial_number")}
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="serial-no"
-            type="text"
+            type="number"
             placeholder="394857739"
           />
           <p className="text-gray-600 text-xs italic">
-            Serial Number must be unique
+            Serial Number must be a unique set of numbers for each item
           </p>
         </div>
       </div>
@@ -101,6 +149,7 @@ function ItemForm() {
               className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               id="location"
             >
+              <option value="">Select</option>
               <option value="Ampara">Ampara</option>
               <option value="Anuradhapura">Anuradhapura</option>
               <option value="Badulla">Badulla</option>
@@ -165,7 +214,7 @@ function ItemForm() {
             onChange={handleChange("quantity_available")}
             className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="quantity"
-            type="number"
+            type="text"
             placeholder="100"
           />
         </div>
@@ -185,12 +234,26 @@ function ItemForm() {
           />
         </div>
       </div>
-      <button
-        type="submit"
-        className="px-2 w-24 h-8 bg-accent font-medium text-sm text-white rounded-full"
-      >
-        Add
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          type="submit"
+          className="px-2 w-24 h-8 bg-accent font-medium text-sm text-white rounded-full"
+        >
+          Add
+        </button>
+        {error && (
+          <div className="bg-accent/5 flex items-center gap-2 rounded-full border-[1px] border-accent py-2 px-2">
+            <ExclamationCircleIcon className="w-5 text-accent" />
+            <p className="text-xs font-bold text-accent">{error}</p>
+          </div>
+        )}
+        {success && !error && (
+          <div className="bg-green-600/5 flex items-center gap-2 rounded-full border-[1px] border-green-600 py-2 px-2">
+            <ExclamationCircleIcon className="w-5 text-green-600" />
+            <p className="text-xs font-bold text-green-600">Item Added</p>
+          </div>
+        )}
+      </div>
     </form>
   );
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LandingPage from "./components/LandingPage";
@@ -6,7 +5,6 @@ import LandingPage from "./components/LandingPage";
 import { Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import Inventory from "./pages/inventory";
-import updateItem from "./pages/updateItem";
 
 function App() {
   return (
