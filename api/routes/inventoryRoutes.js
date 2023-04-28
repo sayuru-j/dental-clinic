@@ -10,6 +10,8 @@ const {
   createInventoryItem,
   deleteInventoryItem,
   sendEmail,
+  updateInventoryItem,
+  getItemById,
 } = require("../controllers/inventoryController");
 
 const router = express.Router();
@@ -18,7 +20,11 @@ router.route("/").get(getInventory);
 router
   .route("/add")
   .post(inventoryCreateValidator, runValidation, createInventoryItem);
-router.route("/:id").delete(deleteInventoryItem);
+router
+  .route("/:id")
+  .get(getItemById)
+  .delete(deleteInventoryItem)
+  .put(inventoryCreateValidator, runValidation, updateInventoryItem);
 
 router.route("/send-email").post(sendEmail);
 

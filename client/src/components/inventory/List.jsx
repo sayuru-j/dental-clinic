@@ -20,7 +20,7 @@ function List() {
 
   useEffect(() => {
     getInventory();
-  }, [inventory]);
+  });
 
   const exportPDF = () => {
     let element = table.current;

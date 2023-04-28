@@ -1,4 +1,8 @@
-import { PencilAltIcon, TrashIcon } from "@heroicons/react/solid";
+import {
+  ExclamationCircleIcon,
+  PencilAltIcon,
+  TrashIcon,
+} from "@heroicons/react/outline";
 import { Link } from "react-router-dom";
 
 import axios from "axios";
@@ -17,11 +21,15 @@ function ListItem({
   collapse,
 }) {
   const [daysUntilExpiration, setDateUntilExpiration] = useState(null);
+  const [isDeleted, setIsDeleted] = useState(false);
   const handleDelete = async () => {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_API}/inventory/${_id}`
-    );
-    alert(response.data?.success);
+    if (window.confirm("Are you sure?")) {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API}/inventory/${_id}`
+      );
+      alert(response.data?.success);
+      setIsDeleted(true);
+    }
   };
 
   useEffect(() => {
@@ -35,6 +43,38 @@ function ListItem({
 
     calculateDaysUntilExpiration();
   }, [expiry_date]);
+
+  const deleteAlert = () => {
+    return (
+      <tr
+        className="fixed flex items-center justify-center 
+      bottom-2 left-5 py-2 px-10 gap-2 bg-white border-[1px] text-red-600 rounded border-red-600"
+      >
+        <td className="font-semibold">Item deleted</td>
+      </tr>
+    );
+  };
+
+  // put your recieving email address here
+  const email = "example@email.com";
+
+  useEffect(() => {
+    const sendEmail = async () => {
+      try {
+        await axios.post(`${import.meta.env.VITE_API}/inventory/send-email`, {
+          item_name,
+          sku,
+          email,
+        });
+      } catch (err) {
+        console.log("Error sending email", err);
+      }
+    };
+
+    if (daysUntilExpiration !== null && daysUntilExpiration <= 7) {
+      sendEmail();
+    }
+  }, [daysUntilExpiration, item_name, sku]);
 
   return (
     <tbody className="">
@@ -58,11 +98,11 @@ function ListItem({
               {daysUntilExpiration <= 0 ? (
                 <span>Expired</span>
               ) : (
-                <span>{daysUntilExpiration}</span>
+                <span>{daysUntilExpiration} Days left</span>
               )}
             </p>
           ) : (
-            <p>{daysUntilExpiration}</p>
+            <p>{daysUntilExpiration} Days left</p>
           )}
         </td>
         <td>{quantity_available}</td>
@@ -80,6 +120,7 @@ function ListItem({
           </div>
         </td>
       </tr>
+      {isDeleted && deleteAlert()}
     </tbody>
   );
 }
